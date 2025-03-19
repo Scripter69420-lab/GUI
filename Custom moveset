@@ -1,182 +1,57 @@
--- Sound ID to play on left click
-local soundID = "rbxassetid://8395383233"
+-- LocalScript inside StarterPlayer -> StarterPlayerScripts
 
--- Get the player and mouse
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
+local fireballCooldown = 3  -- Cooldown between fireball attacks in seconds
+local canFire = true  -- Whether the player can fire a fireball
 
--- Cooldown time (in seconds) and delay before playing the sound
-local cooldownTime = 0.5  -- Cooldown of 0.5 seconds between clicks
-local delayTime = 0.2  -- Delay of 0.2 seconds before playing the sound
+-- Fireball sound ID (change if you have a different sound)
+local fireballSoundID = "rbxassetid://8395383233"
 
--- Variable to track cooldown status
-local canPlaySound = true
-
--- Function to play the sound
-local function playSound()
-    if canPlaySound then
-        -- Start cooldown
-        canPlaySound = false
-
-        -- Wait for the delay before playing the sound
-        wait(delayTime)
-
-        -- Create a new sound instance
-        local sound = Instance.new("Sound")
-        sound.SoundId = soundID
-        sound.Parent = workspace  -- Play the sound in the workspace
-        sound:Play()  -- Play the sound
-
-        -- Destroy the sound after it finishes playing (optional)
-        sound.Ended:Connect(function()
-            sound:Destroy()
-        end)
-
-        -- Wait for the cooldown before allowing the sound to play again
-        wait(cooldownTime)
-        canPlaySound = true  -- Reset cooldown
-    end
-end
-
--- Detect left mouse button click (Button1Down is the left mouse button)
-mouse.Button1Down:Connect(function()
-    playSound()  -- Call the function to play sound when left-clicking
-end)
--- Fireball Attack Script
-local fireballID = "rbxassetid://8395383233"  -- Sound ID for fireball
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local mouse = player:GetMouse()
-
-local fireballCooldown = 3
-local canUseFireball = true
-
+-- Function to create and launch a fireball
 local function fireballAttack()
-    if not canUseFireball then return end
-    canUseFireball = false
+    if not canFire then return end
+    canFire = false
 
-    -- Fireball sound effect
+    -- Fireball Sound Effect
     local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://8395383233" -- Sound ID for fireball
-    sound.Parent = character
+    sound.SoundId = fireballSoundID
+    sound.Parent = game.Workspace
     sound:Play()
 
-    -- Create fireball part
+    -- Create fireball (visual part)
     local fireball = Instance.new("Part")
-    fireball.Size = Vector3.new(2, 2, 2)
     fireball.Shape = Enum.PartType.Ball
-    fireball.Position = character.PrimaryPart.Position + Vector3.new(0, 5, 0)  -- Spawn fireball above the character
+    fireball.Size = Vector3.new(2, 2, 2)
+    fireball.Position = player.Character.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
     fireball.BrickColor = BrickColor.new("Bright red")
-    fireball.Anchored = true
+    fireball.Anchored = false
     fireball.CanCollide = false
-    fireball.Parent = workspace
+    fireball.Parent = game.Workspace
 
-    -- Fireball movement (towards mouse position)
+    -- Fireball movement towards mouse
     local direction = (mouse.Hit.p - fireball.Position).unit
-    local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear)
-    local goal = {Position = mouse.Hit.p}
-    local tween = game:GetService("TweenService"):Create(fireball, tweenInfo, goal)
-    tween:Play()
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(5000, 5000, 5000)
+    bodyVelocity.Velocity = direction * 100
+    bodyVelocity.Parent = fireball
 
-    -- Destroy fireball after the tween completes
-    tween.Completed:Connect(function()
+    -- Destroy fireball after a short time or upon collision
+    fireball.Touched:Connect(function(hit)
+        if hit.Parent:FindFirstChild("Humanoid") then
+            hit.Parent.Humanoid:TakeDamage(20)  -- Apply damage to target
+        end
         fireball:Destroy()
     end)
 
-    -- Cooldown for the fireball attack
+    -- Wait for cooldown before allowing another fireball
     wait(fireballCooldown)
-    canUseFireball = true
+    canFire = true
 end
 
--- Bind the fireball to a key (example: "Q" key)
+-- Listen for key press to trigger the fireball
 game:GetService("UserInputService").InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.Q then
         fireballAttack()
     end
 end)
--- Meteor Shower Script
-local meteorCooldown = 10
-local canUseMeteor = true
-
-local function meteorShower(targetPosition)
-    if not canUseMeteor then return end
-    canUseMeteor = false
-
-    -- Create meteor falling effect
-    for i = 1, 5 do  -- 5 meteors
-        local meteor = Instance.new("Part")
-        meteor.Size = Vector3.new(4, 4, 4)
-        meteor.Shape = Enum.PartType.Ball
-        meteor.Position = targetPosition + Vector3.new(math.random(-10, 10), 50, math.random(-10, 10))
-        meteor.BrickColor = BrickColor.new("Bright red")
-        meteor.Anchored = false
-        meteor.CanCollide = true
-        meteor.Parent = workspace
-
-        -- Apply gravity and simulate falling
-        local bodyVelocity = Instance.new("BodyVelocity")
-        bodyVelocity.Velocity = Vector3.new(0, -50, 0)
-        bodyVelocity.MaxForce = Vector3.new(5000, 5000, 5000)
-        bodyVelocity.Parent = meteor
-
-        -- Explosion on impact
-        meteor.Touched:Connect(function(hit)
-            if hit and hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
-                hit.Parent.Humanoid:TakeDamage(30)  -- Apply damage
-            end
-            meteor:Destroy()  -- Destroy meteor after it hits
-        end)
-
-        wait(0.2)  -- Small delay between each meteor
-    end
-
-    -- Cooldown for the meteor shower
-    wait(meteorCooldown)
-    canUseMeteor = true
-end
-
--- Bind the meteor shower to a key (example: "E" key)
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.E then
-        meteorShower(mouse.Hit.p)
-    end
-end)
--- Teleport Dash Script
-local teleportCooldown = 5
-local canUseTeleport = true
-
-local function teleportDash(targetPosition)
-    if not canUseTeleport then return end
-    canUseTeleport = false
-
-    -- Teleport sound effect
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://8395383233"  -- Example sound ID
-    sound.Parent = character
-    sound:Play()
-
-    -- Move the character instantly to the target position
-    character:SetPrimaryPartCFrame(CFrame.new(targetPosition))
-
-    -- Cooldown for teleport dash
-    wait(teleportCooldown)
-    canUseTeleport = true
-end
-
--- Bind the teleport dash to a key (example: "R" key)
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.R then
-        teleportDash(mouse.Hit.p)
-    end
-end)
-local animation = Instance.new("Animation")
-animation.AnimationId = "rbxassetid://<your-animation-id>"
-local humanoid = character:WaitForChild("Humanoid")
-local animTrack = humanoid:LoadAnimation(animation)
-animTrack:Play()
-local animation = Instance.new("Animation")
-animation.AnimationId = "rbxassetid://<4211409027>" 
-local humanoid = character:WaitForChild("Humanoid")
-local animTrack = humanoid:LoadAnimation(animation)
-animTrack:Play()
