@@ -1,3 +1,47 @@
+-- Sound ID to play on left click
+local soundID = "rbxassetid://8395383233"
+
+-- Get the player and mouse
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+-- Cooldown time (in seconds) and delay before playing the sound
+local cooldownTime = 0.5  -- Cooldown of 0.5 seconds between clicks
+local delayTime = 0.2  -- Delay of 0.2 seconds before playing the sound
+
+-- Variable to track cooldown status
+local canPlaySound = true
+
+-- Function to play the sound
+local function playSound()
+    if canPlaySound then
+        -- Start cooldown
+        canPlaySound = false
+
+        -- Wait for the delay before playing the sound
+        wait(delayTime)
+
+        -- Create a new sound instance
+        local sound = Instance.new("Sound")
+        sound.SoundId = soundID
+        sound.Parent = workspace  -- Play the sound in the workspace
+        sound:Play()  -- Play the sound
+
+        -- Destroy the sound after it finishes playing (optional)
+        sound.Ended:Connect(function()
+            sound:Destroy()
+        end)
+
+        -- Wait for the cooldown before allowing the sound to play again
+        wait(cooldownTime)
+        canPlaySound = true  -- Reset cooldown
+    end
+end
+
+-- Detect left mouse button click (Button1Down is the left mouse button)
+mouse.Button1Down:Connect(function()
+    playSound()  -- Call the function to play sound when left-clicking
+end)
 -- Fireball Attack Script
 local fireballID = "rbxassetid://8395383233"  -- Sound ID for fireball
 local player = game.Players.LocalPlayer
