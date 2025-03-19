@@ -1,0 +1,185 @@
+-- This script should be placed inside a LocalScript under StarterPlayerScripts
+
+-- Create a ScreenGui for the GUI
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+screenGui.Name = "ControlPanel"
+
+-- Create a Frame to hold the UI elements
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 800)  -- Increased height to accommodate more buttons
+frame.Position = UDim2.new(0.8, 0, 0.1, 0)
+frame.BackgroundTransparency = 0.5
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 255)  -- Blue color
+frame.Parent = screenGui
+
+-- Make the frame movable
+local dragging = false
+local dragInput = nil
+local dragStart = nil
+local startPos = nil
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Create a ScrollingFrame for the buttons
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+scrollFrame.CanvasSize = UDim2.new(0, 0, 9, 0)  -- Adjusted to fit all buttons
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.Parent = frame
+
+-- Create a UIListLayout to stack buttons vertically
+local listLayout = Instance.new("UIListLayout")
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Parent = scrollFrame
+
+-- Function to create a button
+local function createButton(name, func)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 0, 50)
+    button.Text = name
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(0, 0, 200)  -- Blue button color
+    button.Parent = scrollFrame
+
+    button.MouseButton1Click:Connect(func)
+end
+
+-- Custom Attack Damage System
+local attackDamage = 10  -- Default attack damage
+
+local function setAttackDamage(newDamage)
+    attackDamage = newDamage
+    -- Assuming the game uses a tool or method to attack, you could apply the new damage here.
+    -- Example: player.Character.Humanoid:TakeDamage(attackDamage)
+    print("Attack damage set to: " .. attackDamage)
+end
+
+-- Speed Boost System
+local normalSpeed = 16  -- Default walking speed
+local boostedSpeed = 50  -- Boosted speed
+
+local function setSpeedBoost(enable)
+    if enable then
+        player.Character.Humanoid.WalkSpeed = boostedSpeed
+        print("Speed boost enabled.")
+    else
+        player.Character.Humanoid.WalkSpeed = normalSpeed
+        print("Speed boost disabled.")
+    end
+end
+
+-- Jump Height Increase
+local normalJumpHeight = 50  -- Default jump height
+local increasedJumpHeight = 100  -- Increased jump height
+
+local function setJumpHeight(isIncreased)
+    if isIncreased then
+        player.Character.Humanoid.JumpHeight = increasedJumpHeight
+        print("Jump height increased.")
+    else
+        player.Character.Humanoid.JumpHeight = normalJumpHeight
+        print("Jump height reset.")
+    end
+end
+
+-- TP Tool
+local function giveTPTool()
+    -- Create a Tool
+    local tool = Instance.new("Tool")
+    tool.Name = "TPTool"
+    tool.RequiresHandle = true
+    tool.Parent = player.Backpack
+    
+    -- Create the tool handle (the object that the player holds)
+    local handle = Instance.new("Part")
+    handle.Size = Vector3.new(1, 1, 1)
+    handle.Anchored = false
+    handle.CanCollide = false
+    handle.Name = "Handle"
+    handle.Parent = tool
+    
+    -- Set up click event to teleport the player
+    tool.Activated:Connect(function()
+        -- Raycast to find the part where the player clicked
+        local mouse = player:GetMouse()
+        local targetPosition = mouse.Hit.p
+        
+        -- Teleport player to clicked position
+        player.Character:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+    end)
+end
+
+-- Create buttons for various functionalities
+createButton("Give TP Tool", function()
+    giveTPTool()  -- This gives the player the TP tool when clicked
+end)
+
+createButton("Set Speed to Normal", function()
+    setSpeedBoost(false)  -- Resets speed to normal
+end)
+
+createButton("Set Speed to Boosted", function()
+    setSpeedBoost(true)  -- Enables speed boost
+end)
+
+createButton("Increase Jump Height", function()
+    setJumpHeight(true)  -- Increase jump height
+end)
+
+createButton("Reset Jump Height", function()
+    setJumpHeight(false)  -- Reset jump height
+end)
+
+createButton("Set Attack Damage to 50", function()
+    setAttackDamage(50)  -- Set attack damage to 50
+end)
+
+createButton("Set Attack Damage to 100", function()
+    setAttackDamage(100)  -- Set attack damage to 100
+end)
+
+createButton("Reset Attack Damage", function()
+    setAttackDamage(10)  -- Reset attack damage to default (10)
+end)
+
+-- Category for External Scripts
+createButton("Chainsaw Man Script", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/CHAINSAW%20MAN/Chainsaw%20Man%20(Obfuscated).txt"))()
+end)
+
+createButton("Void Garou Script", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Void%20Reaper%20Obfuscated.txt"))()
+end)
+
+createButton("Idek Script", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/niki21233/undonethokunas/refs/heads/main/thokunasundone"))()
+end)
+
+createButton("TRASHCAN MAN Script", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Trashcan%20Man"))()
+end)
+
+-- OP Category
+createButton("Nameless Admin Script", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"))()
+end)
