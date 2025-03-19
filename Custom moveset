@@ -1,0 +1,138 @@
+-- Fireball Attack Script
+local fireballID = "rbxassetid://8395383233"  -- Sound ID for fireball
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local mouse = player:GetMouse()
+
+local fireballCooldown = 3
+local canUseFireball = true
+
+local function fireballAttack()
+    if not canUseFireball then return end
+    canUseFireball = false
+
+    -- Fireball sound effect
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://8395383233" -- Sound ID for fireball
+    sound.Parent = character
+    sound:Play()
+
+    -- Create fireball part
+    local fireball = Instance.new("Part")
+    fireball.Size = Vector3.new(2, 2, 2)
+    fireball.Shape = Enum.PartType.Ball
+    fireball.Position = character.PrimaryPart.Position + Vector3.new(0, 5, 0)  -- Spawn fireball above the character
+    fireball.BrickColor = BrickColor.new("Bright red")
+    fireball.Anchored = true
+    fireball.CanCollide = false
+    fireball.Parent = workspace
+
+    -- Fireball movement (towards mouse position)
+    local direction = (mouse.Hit.p - fireball.Position).unit
+    local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear)
+    local goal = {Position = mouse.Hit.p}
+    local tween = game:GetService("TweenService"):Create(fireball, tweenInfo, goal)
+    tween:Play()
+
+    -- Destroy fireball after the tween completes
+    tween.Completed:Connect(function()
+        fireball:Destroy()
+    end)
+
+    -- Cooldown for the fireball attack
+    wait(fireballCooldown)
+    canUseFireball = true
+end
+
+-- Bind the fireball to a key (example: "Q" key)
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.Q then
+        fireballAttack()
+    end
+end)
+-- Meteor Shower Script
+local meteorCooldown = 10
+local canUseMeteor = true
+
+local function meteorShower(targetPosition)
+    if not canUseMeteor then return end
+    canUseMeteor = false
+
+    -- Create meteor falling effect
+    for i = 1, 5 do  -- 5 meteors
+        local meteor = Instance.new("Part")
+        meteor.Size = Vector3.new(4, 4, 4)
+        meteor.Shape = Enum.PartType.Ball
+        meteor.Position = targetPosition + Vector3.new(math.random(-10, 10), 50, math.random(-10, 10))
+        meteor.BrickColor = BrickColor.new("Bright red")
+        meteor.Anchored = false
+        meteor.CanCollide = true
+        meteor.Parent = workspace
+
+        -- Apply gravity and simulate falling
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, -50, 0)
+        bodyVelocity.MaxForce = Vector3.new(5000, 5000, 5000)
+        bodyVelocity.Parent = meteor
+
+        -- Explosion on impact
+        meteor.Touched:Connect(function(hit)
+            if hit and hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
+                hit.Parent.Humanoid:TakeDamage(30)  -- Apply damage
+            end
+            meteor:Destroy()  -- Destroy meteor after it hits
+        end)
+
+        wait(0.2)  -- Small delay between each meteor
+    end
+
+    -- Cooldown for the meteor shower
+    wait(meteorCooldown)
+    canUseMeteor = true
+end
+
+-- Bind the meteor shower to a key (example: "E" key)
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E then
+        meteorShower(mouse.Hit.p)
+    end
+end)
+-- Teleport Dash Script
+local teleportCooldown = 5
+local canUseTeleport = true
+
+local function teleportDash(targetPosition)
+    if not canUseTeleport then return end
+    canUseTeleport = false
+
+    -- Teleport sound effect
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://8395383233"  -- Example sound ID
+    sound.Parent = character
+    sound:Play()
+
+    -- Move the character instantly to the target position
+    character:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+
+    -- Cooldown for teleport dash
+    wait(teleportCooldown)
+    canUseTeleport = true
+end
+
+-- Bind the teleport dash to a key (example: "R" key)
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.R then
+        teleportDash(mouse.Hit.p)
+    end
+end)
+local animation = Instance.new("Animation")
+animation.AnimationId = "rbxassetid://<your-animation-id>"
+local humanoid = character:WaitForChild("Humanoid")
+local animTrack = humanoid:LoadAnimation(animation)
+animTrack:Play()
+local animation = Instance.new("Animation")
+animation.AnimationId = "rbxassetid://<4211409027>" 
+local humanoid = character:WaitForChild("Humanoid")
+local animTrack = humanoid:LoadAnimation(animation)
+animTrack:Play()
