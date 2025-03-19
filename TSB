@@ -65,7 +65,7 @@ local function createButton(name, func)
 end
 
 -- Custom Attack Damage System
-local attackDamage = 10  -- Default attack damage
+local attackDamage = 10000000000  -- Default attack damage
 
 local function setAttackDamage(newDamage)
     attackDamage = newDamage
@@ -75,8 +75,8 @@ local function setAttackDamage(newDamage)
 end
 
 -- Speed Boost System
-local normalSpeed = 16  -- Default walking speed
-local boostedSpeed = 50  -- Boosted speed
+local normalSpeed = 156  -- Default walking speed
+local boostedSpeed = 500  -- Boosted speed
 
 local function setSpeedBoost(enable)
     if enable then
@@ -89,8 +89,8 @@ local function setSpeedBoost(enable)
 end
 
 -- Jump Height Increase
-local normalJumpHeight = 50  -- Default jump height
-local increasedJumpHeight = 100  -- Increased jump height
+local normalJumpHeight = 500  -- Default jump height
+local increasedJumpHeight = 1000  -- Increased jump height
 
 local function setJumpHeight(isIncreased)
     if isIncreased then
@@ -106,7 +106,7 @@ end
 local function giveTPTool()
     -- Create a Tool
     local tool = Instance.new("Tool")
-    tool.Name = "TPTool"
+    tool.Name = "Nigger"
     tool.RequiresHandle = true
     tool.Parent = player.Backpack
     
@@ -182,5 +182,9 @@ end)
 -- OP Category
 createButton("Nameless Admin Script", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"))()
+end)
+
+createButton("Portal Gun Script", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/yofriendfromschool1/Sky-Hub/main/FE%20Trolling%20GUI.luau"))()
 end)
 
